@@ -1,0 +1,22 @@
+.market-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  margin-right: 24px;
+}
+.market-name {
+  font-weight: 500;
+  color: #333;
+}
+.market-value {
+  color: #222;
+}
+.market-up {
+  color: #2cb67d;
+  font-weight: 600;
+}
+.market-down {
+  color: #e63946;
+  font-weight: 600;
+}
