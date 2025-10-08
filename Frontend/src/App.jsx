@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import VerifyOtp from "./pages/VerifyOtp";
 import LoginOtp from "./pages/LoginOtp";
 import Explore from "./pages/Explore";
+import StockDetail from "./pages/StockDetail";
 import "./App.css";
 
 export default function App() {
@@ -18,9 +19,8 @@ export default function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/login-otp" element={<LoginOtp />} />
         <Route path="/explore" element={<Explore />} />
+        <Route path="/stock/:symbol" element={<StockDetail />} />
       </Routes>
     </Router>
   );
 }
-
-

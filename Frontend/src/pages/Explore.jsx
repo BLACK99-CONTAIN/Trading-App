@@ -90,7 +90,11 @@ export default function Explore() {
   };
 
   const renderStockCard = (stock) => (
-    <div key={stock.symbol} className="stock-card">
+    <div 
+      key={stock.symbol} 
+      className="stock-card"
+      onClick={() => navigate(`/stock/${stock.symbol}`)}
+    >
       <div className="stock-info">
         <div className="stock-symbol">{stock.symbol}</div>
         <div className="stock-name">{stock.name}</div>

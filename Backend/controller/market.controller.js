@@ -458,3 +458,96 @@ exports.getWatchlist = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch watchlist' });
   }
 };
+// === GET STOCK CHART DATA ===
+exports.getStockChart = async (req, res) => {
+  try {
+    const { symbol, period = '1D' } = req.params;
+    
+    const chartData = generateMockChartData(symbol, period);
+    
+    res.json({
+      symbol,
+      period,
+      chartData,
+      dataSource: 'mock'
+    });
+    
+  } catch (error) {
+    console.error('Error fetching chart data:', error);
+    res.status(500).json({ message: 'Failed to fetch chart data' });
+  }
+};
+
+// Helper function to generate mock chart data
+const generateMockChartData = (symbol, period) => {
+  const basePrice = getBasePrice(symbol);
+  const dataPoints = getDataPoints(period);
+  const data = [];
+  
+  for (let i = 0; i < dataPoints; i++) {
+    const timestamp = getTimestamp(period, i, dataPoints);
+    const priceVariation = (Math.random() - 0.5) * 0.05 * basePrice;
+    const trendFactor = (i / dataPoints) * 0.1 * basePrice;
+    const price = basePrice + priceVariation + trendFactor;
+    
+    data.push({
+      time: timestamp,
+      price: parseFloat(price.toFixed(2)),
+      volume: Math.floor(Math.random() * 1000000) + 100000,
+      high: parseFloat((price * (1 + Math.random() * 0.02)).toFixed(2)),
+      low: parseFloat((price * (1 - Math.random() * 0.02)).toFixed(2)),
+      open: parseFloat((price + (Math.random() - 0.5) * 10).toFixed(2))
+    });
+  }
+  
+  return data;
+};
+
+const getBasePrice = (symbol) => {
+  const prices = {
+    'RELIANCE': 2456.75,
+    'TCS': 3678.90,
+    'INFY': 1534.25,
+    'HDFCBANK': 1678.30,
+    'ICICIBANK': 967.45,
+    'ADANIPORTS': 876.45,
+    'TATASTEEL': 134.75,
+    'BAJFINANCE': 6789.10
+  };
+  return prices[symbol.toUpperCase()] || 1000;
+};
+
+const getDataPoints = (period) => {
+  const points = {
+    '1D': 78,
+    '1W': 7,
+    '1M': 30,
+    '3M': 90,
+    '6M': 180,
+    '1Y': 365,
+    'ALL': 1000
+  };
+  return points[period] || 30;
+};
+
+const getTimestamp = (period, index, total) => {
+  const now = new Date();
+  
+  switch (period) {
+    case '1D':
+      const tradingStart = new Date(now);
+      tradingStart.setHours(9, 15, 0, 0);
+      const minutes = Math.floor(index * 390 / total);
+      const time = new Date(tradingStart.getTime() + minutes * 60000);
+      return time.toTimeString().slice(0, 5);
+    
+    case '1W':
+      const weekStart = new Date(now.getTime() - (6 - index) * 24 * 60 * 60 * 1000);
+      return weekStart.toLocaleDateString('en-IN');
+    
+    default:
+      const daysAgo = total - index - 1;
+      const date = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+      return date.toLocaleDateString('en-IN');
+  }
+};
