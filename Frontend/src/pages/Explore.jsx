@@ -155,20 +155,6 @@ export default function Explore() {
     <>
       <Navbar />
       <div className="explore-container" style={{ paddingTop: "70px" }}>
-        <header className="explore-header">
-          <div className="header-left">
-            <button className="logo-btn" onClick={() => navigate("/")}>
-              🟩 Black99
-            </button>
-            <h1>Explore</h1>
-          </div>
-          <div className="header-right">
-            <div className="user-info">Welcome, {user?.username}</div>
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </header>
 
         <section className="market-summary">
           <div className="summary-card">

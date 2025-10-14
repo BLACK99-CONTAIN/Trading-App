@@ -43,28 +43,16 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* Right Section: Search, Bell, Terminal, Profile */}
+      {/* Right Section: Search, Profile */}
       <div className="navbar-right">
         <div className="search-box">
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Search Groww..."
+            placeholder="Search..."
             className="search-input"
           />
         </div>
-
-        <button className="icon-btn" title="Notifications">
-          🔔
-        </button>
-
-        <button className="terminal-btn">
-          ⚙️ Terminal
-        </button>
-
-        <button className="trade-btn">
-          915.trade ↗
-        </button>
 
         <button className="profile-btn" onClick={handleLogout} title="Logout">
           👤

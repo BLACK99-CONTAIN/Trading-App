@@ -71,7 +71,7 @@ export default function Watchlist() {
   return (
     <>
     <Navbar/>
-    <div className="watchlist-container">
+    <div className="watchlist-container" style={{ paddingTop: "70px" }}>
       {/* Index Ticker */}
       <section className="index-ticker">
         <div className="ticker-wrapper">

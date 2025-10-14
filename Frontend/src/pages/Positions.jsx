@@ -104,7 +104,7 @@ export default function Positions() {
   return (
     <>
     <Navbar/>
-    <div className="positions-container">
+    <div className="positions-container" style={{ paddingTop: "70px" }}>
       {/* Index Ticker */}
       <section className="index-ticker">
         <div className="ticker-wrapper">

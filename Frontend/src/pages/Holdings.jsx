@@ -45,105 +45,105 @@ export default function Holdings() {
 
   return (
     <>
-    <Navbar/>
-    <div className="holdings-container">
-      {/* Index Ticker */}
-      <section className="index-ticker">
-        <div className="ticker-wrapper">
-          {indices.map((idx) => (
-            <div key={idx.name} className="ticker-item">
-              <div className="ticker-name">{idx.name}</div>
-              <div className="ticker-value">{idx.value.toLocaleString()}</div>
-              <div className={`ticker-change ${idx.change >= 0 ? "positive" : "negative"}`}>
-                {idx.change >= 0 ? "+" : ""}₹{idx.change} ({idx.changePercent}%)
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="holdings-content">
-        {/* Portfolio Summary */}
-        <section className="portfolio-summary">
-          <div className="summary-box">
-            <div className="summary-item">
-              <div className="summary-label">Invested</div>
-              <div className="summary-value">₹{totalInvested.toLocaleString()}</div>
-            </div>
-            <div className="summary-item">
-              <div className="summary-label">Current Value</div>
-              <div className="summary-value">₹{totalCurrent.toLocaleString()}</div>
-            </div>
-            <div className="summary-item">
-              <div className={`summary-label ${totalGain >= 0 ? "positive" : "negative"}`}>Total Gain/Loss</div>
-              <div className={`summary-value ${totalGain >= 0 ? "positive" : "negative"}`}>
-                {totalGain >= 0 ? "+" : ""}₹{Math.abs(totalGain).toLocaleString()} ({totalGainPercent.toFixed(2)}%)
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Holdings List */}
-        <section className="holdings-section">
-          <h2 className="section-title">Your Holdings ({holdings.length})</h2>
-          <div className="holdings-list">
-            {holdings.map((stock) => {
-              const isProfit = stock.change >= 0;
-              const isDayPositive = stock.dayChange >= 0;
-              return (
-                <div key={stock.symbol} className="holding-card">
-                  <div className="holding-header">
-                    <div className="holding-left">
-                      <div className="symbol-badge">{stock.symbol.charAt(0)}</div>
-                      <div className="holding-info">
-                        <div className="holding-symbol">{stock.symbol}</div>
-                        <div className="holding-name">{stock.name}</div>
-                      </div>
-                    </div>
-                    <button className="view-btn" onClick={() => navigate(`/stock/${stock.symbol}`)}>
-                      View →
-                    </button>
-                  </div>
-
-                  <div className="holding-stats">
-                    <div className="stat">
-                      <span className="stat-label">Qty</span>
-                      <span className="stat-value">{stock.qty}</span>
-                    </div>
-                    <div className="stat">
-                      <span className="stat-label">Avg Price</span>
-                      <span className="stat-value">₹{stock.avgPrice.toLocaleString()}</span>
-                    </div>
-                    <div className="stat">
-                      <span className="stat-label">Current</span>
-                      <span className="stat-value">₹{stock.currentPrice.toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="holding-prices">
-                    <div className="price-info">
-                      <div className="invested-label">Invested</div>
-                      <div className="invested-value">₹{stock.invested.toLocaleString()}</div>
-                    </div>
-                    <div className="divider"></div>
-                    <div className="current-info">
-                      <div className="current-value">₹{stock.current.toLocaleString()}</div>
-                      <div className={`gain-loss ${isProfit ? "positive" : "negative"}`}>
-                        {isProfit ? "+" : ""}₹{Math.abs(stock.change).toFixed(2)} ({stock.changePercent.toFixed(2)}%)
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={`day-change ${isDayPositive ? "positive" : "negative"}`}>
-                    Today: {isDayPositive ? "+" : ""}₹{stock.dayChange.toFixed(2)} ({stock.dayChangePercent.toFixed(2)}%)
-                  </div>
+      <Navbar />
+      <div className="holdings-container" style={{ paddingTop: "70px" }}>
+        {/* Index Ticker */}
+        <section className="index-ticker">
+          <div className="ticker-wrapper">
+            {indices.map((idx) => (
+              <div key={idx.name} className="ticker-item">
+                <div className="ticker-name">{idx.name}</div>
+                <div className="ticker-value">{idx.value.toLocaleString()}</div>
+                <div className={`ticker-change ${idx.change >= 0 ? "positive" : "negative"}`}>
+                  {idx.change >= 0 ? "+" : ""}₹{idx.change} ({idx.changePercent}%)
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </section>
+
+        <div className="holdings-content">
+          {/* Portfolio Summary */}
+          <section className="portfolio-summary">
+            <div className="summary-box">
+              <div className="summary-item">
+                <div className="summary-label">Invested</div>
+                <div className="summary-value">₹{totalInvested.toLocaleString()}</div>
+              </div>
+              <div className="summary-item">
+                <div className="summary-label">Current Value</div>
+                <div className="summary-value">₹{totalCurrent.toLocaleString()}</div>
+              </div>
+              <div className="summary-item">
+                <div className={`summary-label ${totalGain >= 0 ? "positive" : "negative"}`}>Total Gain/Loss</div>
+                <div className={`summary-value ${totalGain >= 0 ? "positive" : "negative"}`}>
+                  {totalGain >= 0 ? "+" : ""}₹{Math.abs(totalGain).toLocaleString()} ({totalGainPercent.toFixed(2)}%)
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Holdings List */}
+          <section className="holdings-section">
+            <h2 className="section-title">Your Holdings ({holdings.length})</h2>
+            <div className="holdings-list">
+              {holdings.map((stock) => {
+                const isProfit = stock.change >= 0;
+                const isDayPositive = stock.dayChange >= 0;
+                return (
+                  <div key={stock.symbol} className="holding-card">
+                    <div className="holding-header">
+                      <div className="holding-left">
+                        <div className="symbol-badge">{stock.symbol.charAt(0)}</div>
+                        <div className="holding-info">
+                          <div className="holding-symbol">{stock.symbol}</div>
+                          <div className="holding-name">{stock.name}</div>
+                        </div>
+                      </div>
+                      <button className="view-btn" onClick={() => navigate(`/stock/${stock.symbol}`)}>
+                        View →
+                      </button>
+                    </div>
+
+                    <div className="holding-stats">
+                      <div className="stat">
+                        <span className="stat-label">Qty</span>
+                        <span className="stat-value">{stock.qty}</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-label">Avg Price</span>
+                        <span className="stat-value">₹{stock.avgPrice.toLocaleString()}</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-label">Current</span>
+                        <span className="stat-value">₹{stock.currentPrice.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    <div className="holding-prices">
+                      <div className="price-info">
+                        <div className="invested-label">Invested</div>
+                        <div className="invested-value">₹{stock.invested.toLocaleString()}</div>
+                      </div>
+                      <div className="divider"></div>
+                      <div className="current-info">
+                        <div className="current-value">₹{stock.current.toLocaleString()}</div>
+                        <div className={`gain-loss ${isProfit ? "positive" : "negative"}`}>
+                          {isProfit ? "+" : ""}₹{Math.abs(stock.change).toFixed(2)} ({stock.changePercent.toFixed(2)}%)
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`day-change ${isDayPositive ? "positive" : "negative"}`}>
+                      Today: {isDayPositive ? "+" : ""}₹{stock.dayChange.toFixed(2)} ({stock.dayChangePercent.toFixed(2)}%)
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
     </>
   );
 }
