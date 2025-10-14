@@ -43,7 +43,7 @@ export default function Portfolio() {
 
   const fetchOrders = async (token) => {
     try {
-      const response = await fetch('http://localhost:5000/api/orders/history', {
+      const response = await fetch('https://trading-app-backend-6ibt.onrender.com/api/orders/history', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
@@ -83,7 +83,7 @@ export default function Portfolio() {
 
   const fetchHoldings = async (token) => {
     try {
-      const response = await fetch('http://localhost:5000/api/portfolio/holdings', {
+      const response = await fetch('https://trading-app-backend-6ibt.onrender.com/api/portfolio/holdings', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
@@ -138,7 +138,7 @@ export default function Portfolio() {
   const handleCancelOrder = async (orderId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/cancel`, {
+      const response = await fetch(`https://trading-app-backend-6ibt.onrender.com/api/orders/${orderId}/cancel`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });
