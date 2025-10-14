@@ -45,7 +45,7 @@ export default function Explore() {
 
   const fetchMarketData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/market/explore");
+      const response = await fetch("https://trading-app-backend-6ibt.onrender.com/api/market/explore");
       const data = await response.json();
       setMarketData(data);
     } catch (error) {
