@@ -29,7 +29,7 @@ export default function Portfolio() {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/me', {
+      const response = await fetch('https://trading-app-backend-6ibt.onrender.com/api/users/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
