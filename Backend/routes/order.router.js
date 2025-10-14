@@ -6,7 +6,7 @@ const {
   getOrderById,
   cancelOrder,
   getOrderSummary
-} = require('../controllers/order.controller');
+} = require('../controller/order.controller');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();

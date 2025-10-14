@@ -1,24 +1,24 @@
-// routes/market.router.js - Enhanced with Chart Routes
+// routes/market.router.js - FIXED VERSION
+
 const express = require('express');
+const router = express.Router();
+
+// Import all controller functions
 const {
   getExploreData,
   getStockDetails,
   getStockChart,
-  getSectorStocks,
   searchStocks,
+  getSectorStocks,
   getWatchlist
 } = require('../controller/market.controller');
 
-const router = express.Router();
-
-// Public routes (no authentication required)
+// Public routes
 router.get('/explore', getExploreData);
 router.get('/stock/:symbol', getStockDetails);
-router.get('/chart/:symbol/:period', getStockChart); // New chart endpoint
-router.get('/sector/:sector', getSectorStocks);
+router.get('/chart/:symbol/:period', getStockChart);
 router.get('/search', searchStocks);
-
-// Protected routes (authentication required)
+router.get('/sector/:sector', getSectorStocks);
 router.get('/watchlist', getWatchlist);
 
 module.exports = router;

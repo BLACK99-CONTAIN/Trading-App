@@ -1,0 +1,370 @@
+.watchlist-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.watchlist-content {
+  padding: 2rem;
+}
+
+.watchlist-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  color: #fff;
+}
+
+/* Watchlist Stats */
+.watchlist-stats {
+  margin-bottom: 2rem;
+}
+
+.stats-box {
+  background: linear-gradient(135deg, rgba(0, 255, 179, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+  border: 1px solid rgba(0, 255, 179, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  align-items: center;
+}
+
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stats-label {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.stats-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.stats-value.positive {
+  color: #00ffb3;
+}
+
+.stats-value.negative {
+  color: #ff4757;
+}
+
+.add-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%);
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 255, 179, 0.4);
+}
+
+/* Add Stock Form */
+.add-stock-form {
+  margin-bottom: 2rem;
+}
+
+.form-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #00ffb3;
+}
+
+.form-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%);
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.form-btn:hover {
+  transform: translateY(-2px);
+}
+
+.form-cancel {
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 71, 87, 0.2);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: 8px;
+  color: #ff4757;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.form-cancel:hover {
+  background: rgba(255, 71, 87, 0.3);
+}
+
+/* Watchlist Section */
+.watchlist-section {
+  margin-top: 2rem;
+}
+
+.watchlist-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.watchlist-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.watchlist-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0, 255, 179, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.symbol-circle {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0a0a0a;
+  font-size: 1.1rem;
+}
+
+.stock-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stock-symbol {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #00ffb3;
+}
+
+.stock-name {
+  font-size: 0.8rem;
+  color: #888;
+  line-height: 1.2;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Card Content */
+.card-content {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.price-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.price-change {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.price-change.positive {
+  color: #00ffb3;
+}
+
+.price-change.negative {
+  color: #ff4757;
+}
+
+/* Card Stats */
+.card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-stats .stat {
+  text-align: center;
+}
+
+.card-stats .stat-label {
+  font-size: 0.75rem;
+  color: #888;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.card-stats .stat-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: block;
+}
+
+/* Card Footer */
+.card-footer {
+  margin-top: auto;
+}
+
+.trade-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%);
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.trade-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 255, 179, 0.4);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: #ccc;
+  margin: 0;
+}
+
+.empty-state p {
+  color: #888;
+  margin: 0;
+  max-width: 300px;
+}
+
+.empty-add-btn {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%);
+  border: none;
+  border-radius: 8px;
+  color: #0a0a0a;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 1rem;
+  transition: all 0.3s;
+}
+
+.empty-add-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .watchlist-content {
+    padding: 1rem;
+  }
+
+  .stats-box {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 1.5rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .watchlist-items {
+    grid-template-columns: 1fr;
+  }
+
+  .card-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

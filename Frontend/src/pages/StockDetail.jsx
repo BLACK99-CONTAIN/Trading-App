@@ -8,10 +8,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Area,
-  AreaChart
+  AreaChart,
+  Area
 } from "recharts";
-import "../App.css";
 
 export default function StockDetail() {
   const { symbol } = useParams();
@@ -20,38 +19,19 @@ export default function StockDetail() {
   const [chartData, setChartData] = useState([]);
   const [chartPeriod, setChartPeriod] = useState("1D");
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [orderType, setOrderType] = useState("BUY");
   const [priceType, setPriceType] = useState("MARKET");
   const [limitPrice, setLimitPrice] = useState("");
-  const [isWatchlisted, setIsWatchlisted] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
+    const token = localStorage.getItem("token");
+    if (!token) navigate("/login");
+    else {
+      fetchStockData();
+      fetchChartData("1D");
     }
-    fetchUserData(token);
-    fetchStockData();
-    fetchChartData("1D");
   }, [symbol]);
-
-  const fetchUserData = async (token) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/users/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
 
   const fetchStockData = async () => {
     try {
@@ -60,7 +40,7 @@ export default function StockDetail() {
       setStock(data);
       setLimitPrice(data.price.toFixed(2));
     } catch (error) {
-      console.error('Error fetching stock data:', error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -72,348 +52,275 @@ export default function StockDetail() {
       const data = await response.json();
       setChartData(data.chartData || []);
     } catch (error) {
-      console.error('Error fetching chart data:', error);
-      // Fallback mock chart data
-      const mockData = generateMockChartData(period);
-      setChartData(mockData);
-    }
-  };
-
-  const generateMockChartData = (period) => {
-    const dataPoints = period === "1D" ? 24 : period === "1W" ? 7 : 30;
-    const basePrice = stock?.price || 2500;
-    const data = [];
-
-    for (let i = 0; i < dataPoints; i++) {
-      const variation = (Math.random() - 0.5) * 0.1 * basePrice;
-      const price = basePrice + variation + (i * 5);
-      data.push({
-        time: period === "1D" ? `${9 + Math.floor(i * 6.5 / dataPoints)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}` 
-             : period === "1W" ? new Date(Date.now() - (7-i) * 24 * 60 * 60 * 1000).toLocaleDateString()
-             : new Date(Date.now() - (30-i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-        price: parseFloat(price.toFixed(2)),
-        volume: Math.floor(Math.random() * 100000) + 50000
-      });
-    }
-    return data;
-  };
-
-  const handleChartPeriodChange = (period) => {
-    setChartPeriod(period);
-    fetchChartData(period);
-  };
-
-  const handleWatchlist = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/market/watchlist/${symbol}`, {
-        method: isWatchlisted ? 'DELETE' : 'POST',
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      if (response.ok) {
-        setIsWatchlisted(!isWatchlisted);
-      }
-    } catch (error) {
-      console.error('Error updating watchlist:', error);
+      console.error("Error:", error);
     }
   };
 
   const handlePlaceOrder = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const orderData = {
         symbol: stock.symbol,
         quantity: parseInt(quantity),
         orderType,
         priceType,
-        price: priceType === 'LIMIT' ? parseFloat(limitPrice) : stock.price
+        price: priceType === "LIMIT" ? parseFloat(limitPrice) : stock.price
       };
 
-      const response = await fetch('http://localhost:5000/api/orders/place', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/orders/place", {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(orderData)
       });
 
       if (response.ok) {
-        setShowOrderModal(false);
-        alert(`${orderType} order placed successfully!`);
+        alert("Order placed successfully!");
+        setQuantity(1);
+        setPriceType("MARKET");
       }
     } catch (error) {
-      console.error('Error placing order:', error);
-      alert('Error placing order. Please try again.');
+      console.error("Error:", error);
     }
-  };
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="chart-tooltip">
-          <p className="tooltip-time">{label}</p>
-          <p className="tooltip-price">₹{payload[0].value.toLocaleString('en-IN')}</p>
-        </div>
-      );
-    }
-    return null;
   };
 
   if (loading) {
     return (
-      <div className="stock-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading stock data...</p>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", background: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)" }}>
+        <div style={{ textAlign: "center", color: "#a0a9b8" }}>
+          <div style={{ width: "50px", height: "50px", border: "4px solid rgba(0, 255, 179, 0.1)", borderLeft: "4px solid #00ffb3", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 1rem" }}></div>
+          Loading...
+        </div>
       </div>
     );
   }
 
-  if (!stock) {
-    return (
-      <div className="stock-error">
-        <h2>Stock not found</h2>
-        <button onClick={() => navigate('/explore')}>Back to Explore</button>
-      </div>
-    );
-  }
+  if (!stock) return null;
 
   return (
-    <div className="stock-detail-container">
+    <div style={{ background: "linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%)", minHeight: "100vh", color: "#fff" }}>
       {/* Header */}
-      <header className="stock-header">
-        <div className="header-left">
-          <button className="back-btn" onClick={() => navigate('/explore')}>
-            ←
-          </button>
-          <div className="stock-title">
-            <div className="stock-logo">{stock.symbol.charAt(0)}</div>
+      <div style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)", background: "rgba(0, 0, 0, 0.3)", padding: "1rem 2rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "1400px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <button onClick={() => navigate("/explore")} style={{ background: "none", border: "none", color: "#00ffb3", fontSize: "1.5rem", cursor: "pointer" }}>←</button>
             <div>
-              <h1>{stock.symbol}</h1>
-              <p>{stock.name}</p>
+              <div style={{ fontSize: "1.5rem", fontWeight: "700" }}>{stock.symbol}</div>
+              <div style={{ fontSize: "0.9rem", color: "#a0a9b8" }}>{stock.name}</div>
             </div>
           </div>
+          <button onClick={() => navigate("/portfolio")} style={{ padding: "0.6rem 1.2rem", background: "rgba(0, 255, 179, 0.1)", border: "1px solid #00ffb3", borderRadius: "6px", color: "#00ffb3", cursor: "pointer", fontWeight: "600" }}>Portfolio</button>
         </div>
-        <div className="header-actions">
-          <button 
-            className={`watchlist-btn ${isWatchlisted ? 'active' : ''}`}
-            onClick={handleWatchlist}
-          >
-            {isWatchlisted ? '★' : '☆'} Watchlist
-          </button>
-          <button className="alert-btn">🔔 Create Alert</button>
-        </div>
-      </header>
+      </div>
 
-      {/* Price Section */}
-      <section className="price-section">
-        <div className="current-price">
-          <span className="price">₹{stock.price.toLocaleString('en-IN')}</span>
-          <span className={`change ${stock.change >= 0 ? 'positive' : 'negative'}`}>
-            {stock.change >= 0 ? '+' : ''}₹{stock.change} ({stock.changePercent >= 0 ? '+' : ''}{stock.changePercent}%)
-          </span>
-        </div>
-        <div className="price-range">
-          <span>Day Range: ₹{(stock.price * 0.95).toFixed(2)} - ₹{(stock.price * 1.05).toFixed(2)}</span>
-        </div>
-      </section>
+      {/* Main Content */}
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "2rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "2rem" }}>
+          {/* Left Column - Chart & Info */}
+          <div>
+            {/* Price Overview */}
+            <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px", padding: "2rem", marginBottom: "2rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+                <div>
+                  <div style={{ fontSize: "2.5rem", fontWeight: "800", color: "#00ffb3", marginBottom: "0.5rem" }}>₹{stock.price.toFixed(2)}</div>
+                  <div style={{ fontSize: "1rem", fontWeight: "600", color: stock.change >= 0 ? "#00ffb3" : "#ff4757" }}>
+                    {stock.change >= 0 ? "▲" : "▼"} ₹{Math.abs(stock.change).toFixed(2)} ({stock.changePercent >= 0 ? "+" : ""}{stock.changePercent.toFixed(2)}%)
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "0.85rem", color: "#a0a9b8", marginBottom: "0.5rem" }}>Market Status</div>
+                  <div style={{ fontSize: "0.9rem", color: "#00ffb3", fontWeight: "600" }}>Open</div>
+                </div>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
+                <div>
+                  <div style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem" }}>Day High</div>
+                  <div style={{ fontSize: "1rem", fontWeight: "600" }}>₹{(stock.price * 1.02).toFixed(2)}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem" }}>Day Low</div>
+                  <div style={{ fontSize: "1rem", fontWeight: "600" }}>₹{(stock.price * 0.98).toFixed(2)}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem" }}>Volume</div>
+                  <div style={{ fontSize: "1rem", fontWeight: "600" }}>{stock.volume}</div>
+                </div>
+              </div>
+            </div>
 
-      {/* Chart Section */}
-      <section className="chart-section">
-        <div className="chart-controls">
-          {['1D', '1W', '1M', '3M', '6M', '1Y', 'ALL'].map(period => (
-            <button
-              key={period}
-              className={`chart-btn ${chartPeriod === period ? 'active' : ''}`}
-              onClick={() => handleChartPeriodChange(period)}
-            >
-              {period}
-            </button>
-          ))}
-        </div>
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height={350}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00ffb3" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#00ffb3" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis 
-                dataKey="time" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#888', fontSize: 12 }}
-              />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#888', fontSize: 12 }}
-                domain={['dataMin - 10', 'dataMax + 10']}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="price"
-                stroke="#00ffb3"
-                strokeWidth={2}
-                fill="url(#colorPrice)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+            {/* Chart */}
+            <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px", padding: "1.5rem", marginBottom: "2rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+                <div style={{ fontSize: "1.1rem", fontWeight: "700" }}>Price Chart</div>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {['1D', '1W', '1M', '3M', '6M', '1Y'].map(p => (
+                    <button
+                      key={p}
+                      onClick={() => {
+                        setChartPeriod(p);
+                        fetchChartData(p);
+                      }}
+                      style={{
+                        padding: "0.4rem 0.8rem",
+                        background: chartPeriod === p ? "linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%)" : "rgba(255, 255, 255, 0.1)",
+                        border: "1px solid " + (chartPeriod === p ? "transparent" : "rgba(255, 255, 255, 0.2)"),
+                        borderRadius: "4px",
+                        color: chartPeriod === p ? "#0a0e27" : "#a0a9b8",
+                        cursor: "pointer",
+                        fontSize: "0.8rem",
+                        fontWeight: "600",
+                        transition: "all 0.3s"
+                      }}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00ffb3" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#00ffb3" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis dataKey="time" tick={{ fill: "#a0a9b8", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "#a0a9b8", fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: "#1a1f3a", border: "1px solid #333", borderRadius: "6px" }} />
+                  <Area type="monotone" dataKey="price" stroke="#00ffb3" strokeWidth={2} fill="url(#grad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
 
-      {/* Stats Grid */}
-      <section className="stats-section">
-        <div className="stats-grid">
-          <div className="stat-item">
-            <span className="stat-label">Market Cap</span>
-            <span className="stat-value">{stock.marketCap || '12.5L Cr'}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">P/E Ratio</span>
-            <span className="stat-value">{stock.pe || '25.6'}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Volume</span>
-            <span className="stat-value">{stock.volume}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">52W High</span>
-            <span className="stat-value">₹{(stock.price * 1.25).toFixed(2)}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">52W Low</span>
-            <span className="stat-value">₹{(stock.price * 0.75).toFixed(2)}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Dividend Yield</span>
-            <span className="stat-value">1.2%</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Order Section */}
-      <section className="order-section">
-        <div className="order-tabs">
-          <button 
-            className={`order-tab ${orderType === 'BUY' ? 'active buy' : ''}`}
-            onClick={() => setOrderType('BUY')}
-          >
-            BUY
-          </button>
-          <button 
-            className={`order-tab ${orderType === 'SELL' ? 'active sell' : ''}`}
-            onClick={() => setOrderType('SELL')}
-          >
-            SELL
-          </button>
-        </div>
-
-        <div className="order-form">
-          <div className="form-row">
-            <label>Quantity</label>
-            <input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              min="1"
-              className="quantity-input"
-            />
-          </div>
-
-          <div className="form-row">
-            <label>Price Type</label>
-            <div className="price-type-buttons">
-              <button
-                className={`price-type-btn ${priceType === 'MARKET' ? 'active' : ''}`}
-                onClick={() => setPriceType('MARKET')}
-              >
-                Market
-              </button>
-              <button
-                className={`price-type-btn ${priceType === 'LIMIT' ? 'active' : ''}`}
-                onClick={() => setPriceType('LIMIT')}
-              >
-                Limit
-              </button>
+            {/* Fundamentals */}
+            <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px", padding: "1.5rem" }}>
+              <div style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "1.5rem" }}>Key Metrics</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
+                {[
+                  { label: "Market Cap", value: stock.marketCap },
+                  { label: "P/E Ratio", value: stock.pe },
+                  { label: "52W High", value: "₹" + (stock.price * 1.25).toFixed(2) },
+                  { label: "52W Low", value: "₹" + (stock.price * 0.75).toFixed(2) },
+                  { label: "Dividend Yield", value: "1.2%" },
+                  { label: "EPS", value: "₹" + (stock.price / stock.pe).toFixed(2) }
+                ].map((metric, i) => (
+                  <div key={i} style={{ borderRight: i % 3 !== 2 ? "1px solid rgba(255, 255, 255, 0.1)" : "none", paddingRight: i % 3 !== 2 ? "1rem" : "0" }}>
+                    <div style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem" }}>{metric.label}</div>
+                    <div style={{ fontSize: "1rem", fontWeight: "600" }}>{metric.value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {priceType === 'LIMIT' && (
-            <div className="form-row">
-              <label>Limit Price</label>
-              <input
-                type="number"
-                value={limitPrice}
-                onChange={(e) => setLimitPrice(e.target.value)}
-                step="0.01"
-                className="limit-price-input"
-              />
-            </div>
-          )}
+          {/* Right Column - Trading Panel */}
+          <div>
+            {/* Trade Tabs */}
+            <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px", overflow: "hidden", marginBottom: "1.5rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                {['BUY', 'SELL'].map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setOrderType(type)}
+                    style={{
+                      padding: "1rem",
+                      background: orderType === type ? type === 'BUY' ? "rgba(0, 255, 179, 0.2)" : "rgba(255, 71, 87, 0.2)" : "transparent",
+                      border: "none",
+                      color: orderType === type ? (type === 'BUY' ? "#00ffb3" : "#ff4757") : "#a0a9b8",
+                      cursor: "pointer",
+                      fontWeight: "700",
+                      transition: "all 0.3s"
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
 
-          <div className="order-summary">
-            <div className="summary-row">
-              <span>Quantity</span>
-              <span>{quantity}</span>
-            </div>
-            <div className="summary-row">
-              <span>Price</span>
-              <span>₹{priceType === 'MARKET' ? stock.price.toFixed(2) : limitPrice}</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total</span>
-              <span>₹{(quantity * (priceType === 'MARKET' ? stock.price : parseFloat(limitPrice || 0))).toFixed(2)}</span>
+              {/* Order Form */}
+              <div style={{ padding: "1.5rem" }}>
+                {/* Quantity */}
+                <div style={{ marginBottom: "1.25rem" }}>
+                  <label style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem", display: "block" }}>Qty</label>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ width: "40px", height: "40px", background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "4px", color: "#00ffb3", cursor: "pointer", fontWeight: "700" }}>−</button>
+                    <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} style={{ flex: 1, background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "4px", color: "#fff", textAlign: "center", fontWeight: "600" }} />
+                    <button onClick={() => setQuantity(quantity + 1)} style={{ width: "40px", height: "40px", background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "4px", color: "#00ffb3", cursor: "pointer", fontWeight: "700" }}>+</button>
+                  </div>
+                </div>
+
+                {/* Price Type */}
+                <div style={{ marginBottom: "1.25rem" }}>
+                  <label style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem", display: "block" }}>Price</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                    {['MARKET', 'LIMIT'].map(type => (
+                      <button
+                        key={type}
+                        onClick={() => setPriceType(type)}
+                        style={{
+                          padding: "0.6rem",
+                          background: priceType === type ? "rgba(0, 255, 179, 0.2)" : "rgba(255, 255, 255, 0.1)",
+                          border: "1px solid " + (priceType === type ? "#00ffb3" : "rgba(255, 255, 255, 0.2)"),
+                          borderRadius: "4px",
+                          color: priceType === type ? "#00ffb3" : "#a0a9b8",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                          fontSize: "0.85rem"
+                        }}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Limit Price */}
+                {priceType === 'LIMIT' && (
+                  <div style={{ marginBottom: "1.25rem" }}>
+                    <label style={{ fontSize: "0.8rem", color: "#a0a9b8", marginBottom: "0.5rem", display: "block" }}>Price (₹)</label>
+                    <input type="number" value={limitPrice} onChange={(e) => setLimitPrice(e.target.value)} style={{ width: "100%", padding: "0.6rem", background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "4px", color: "#fff", fontWeight: "600" }} />
+                  </div>
+                )}
+
+                {/* Summary */}
+                <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "1rem", borderRadius: "6px", marginBottom: "1.25rem", borderTop: "1px solid rgba(255, 255, 255, 0.1)", borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.75rem", fontSize: "0.9rem" }}>
+                    <span style={{ color: "#a0a9b8" }}>Qty</span>
+                    <span style={{ fontWeight: "600" }}>{quantity}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "1rem", fontWeight: "700", color: "#00ffb3" }}>
+                    <span>Total</span>
+                    <span>₹{(quantity * (priceType === 'MARKET' ? stock.price : parseFloat(limitPrice || 0))).toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Order Button */}
+                <button
+                  onClick={handlePlaceOrder}
+                  style={{
+                    width: "100%",
+                    padding: "0.875rem",
+                    background: orderType === 'BUY' ? "linear-gradient(135deg, #00ffb3 0%, #00d4aa 100%)" : "linear-gradient(135deg, #ff4757 0%, #ff3838 100%)",
+                    border: "none",
+                    borderRadius: "6px",
+                    color: orderType === 'BUY' ? "#0a0e27" : "#fff",
+                    fontWeight: "700",
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                    transition: "all 0.3s"
+                  }}
+                >
+                  {orderType} {stock.symbol}
+                </button>
+              </div>
             </div>
           </div>
-
-          <button 
-            className={`place-order-btn ${orderType.toLowerCase()}`}
-            onClick={handlePlaceOrder}
-          >
-            {orderType} {stock.symbol}
-          </button>
         </div>
-      </section>
-
-      {/* Company Info */}
-      <section className="company-info">
-        <h3>About {stock.name}</h3>
-        <p>
-          {stock.name} is a leading company in the Indian stock market with strong fundamentals 
-          and consistent growth trajectory. The company operates across multiple business segments 
-          and has shown resilience in various market conditions.
-        </p>
-        
-        <div className="key-metrics">
-          <h4>Key Metrics</h4>
-          <div className="metrics-grid">
-            <div className="metric">
-              <span>ROE</span>
-              <span>15.2%</span>
-            </div>
-            <div className="metric">
-              <span>Debt to Equity</span>
-              <span>0.3</span>
-            </div>
-            <div className="metric">
-              <span>EPS</span>
-              <span>₹{(stock.price / (stock.pe || 25)).toFixed(2)}</span>
-            </div>
-            <div className="metric">
-              <span>Book Value</span>
-              <span>₹{(stock.price * 0.6).toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
