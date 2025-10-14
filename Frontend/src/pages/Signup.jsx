@@ -17,7 +17,7 @@ export default function Signup() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
+      const res = await fetch("https://trading-app-backend-6ibt.onrender.com/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form)
