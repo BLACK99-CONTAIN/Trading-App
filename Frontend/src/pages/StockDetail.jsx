@@ -35,7 +35,7 @@ export default function StockDetail() {
 
   const fetchStockData = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/market/stock/${symbol}`);
+      const response = await fetch(`https://trading-app-backend-6ibt.onrender.com/api/market/stock/${symbol}`);
       const data = await response.json();
       setStock(data);
       setLimitPrice(data.price.toFixed(2));
@@ -48,7 +48,7 @@ export default function StockDetail() {
 
   const fetchChartData = async (period) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/market/chart/${symbol}/${period}`);
+      const response = await fetch(`https://trading-app-backend-6ibt.onrender.com/api/market/chart/${symbol}/${period}`);
       const data = await response.json();
       setChartData(data.chartData || []);
     } catch (error) {
@@ -67,7 +67,7 @@ export default function StockDetail() {
         price: priceType === "LIMIT" ? parseFloat(limitPrice) : stock.price
       };
 
-      const response = await fetch("http://localhost:5000/api/orders/place", {
+      const response = await fetch("https://trading-app-backend-6ibt.onrender.com/api/orders/place", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

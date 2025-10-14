@@ -17,7 +17,7 @@ export default function Login() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/api/users/login", {
+      const res = await fetch("https://trading-app-backend-6ibt.onrender.com/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form)
