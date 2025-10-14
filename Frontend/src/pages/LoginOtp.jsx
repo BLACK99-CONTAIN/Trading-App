@@ -12,7 +12,7 @@ export default function LoginOtp() {
     e.preventDefault();
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/users/verify-login-otp", {
+      const res = await fetch("https://trading-app-backend-6ibt.onrender.com/api/users/verify-login-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: state.userId, otp })
