@@ -10,10 +10,14 @@ const orderRoutes = require("./routes/order.router");
 
 const app = express();
 
+// 🟢 REQUIRED FOR RENDER & express-rate-limit
+// This fixes the “X-Forwarded-For” warning you saw in the logs
+app.set("trust proxy", 1);
+
 // === Middleware ===
 app.use(express.json());
 
-// ✅ Allow all origins (for development)
+// ✅ Allow all origins (you can restrict later if needed)
 app.use(
   cors({
     origin: "*",
@@ -43,9 +47,17 @@ app.use("/api/orders", orderRoutes);
 
 // === Connect MongoDB ===
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
+
+// === Health check endpoint (useful for Render) ===
+app.get("/", (req, res) => {
+  res.send("✅ Trading App Backend is running.");
+});
 
 // === Start server ===
 const PORT = process.env.PORT || 5000;

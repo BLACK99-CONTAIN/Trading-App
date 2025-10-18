@@ -1,16 +1,10 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const crypto = require('crypto');
 
-// === Setup Gmail transporter ===
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-});
+// Setup SendGrid
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // === Helper: Generate 6-digit OTP ===
 function generateOTP() {
@@ -18,23 +12,35 @@ function generateOTP() {
   return String(n).padStart(6, '0');
 }
 
-// === Helper: Send OTP Email ===
+// === Helper: Send OTP Email via SendGrid ===
 async function sendOtpEmail(toEmail, username, otp) {
-  const html = `
-    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-      <h2>MoneyTrading</h2>
-      <p>Hi <b>${username}</b>,</p>
-      <p>Your OTP code is:</p>
-      <h1 style="letter-spacing: 5px; color: #2c7be5;">${otp}</h1>
-      <p>This code is valid for <b>10 minutes</b>. Please don’t share it with anyone.</p>
-    </div>
-  `;
-  return transporter.sendMail({
-    from: `"MoneyTrading" <${process.env.GMAIL_USER}>`,
+  const msg = {
     to: toEmail,
-    subject: 'Your OTP Code — MoneyTrading',
-    html,
-  });
+    from: process.env.SENDGRID_FROM_EMAIL, // Must be verified in SendGrid
+    subject: 'Your OTP Code – Black99 Trading',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <h2>🟩 Black99 Trading</h2>
+        <p>Hi <b>${username}</b>,</p>
+        <p>Your OTP code is:</p>
+        <h1 style="letter-spacing: 5px; color: #00ffb3; background: #0a0a0a; padding: 15px; border-radius: 8px; display: inline-block;">${otp}</h1>
+        <p>This code is valid for <b>10 minutes</b>. Please don't share it with anyone.</p>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+        <p style="color: #888; font-size: 12px;">If you didn't request this code, please ignore this email.</p>
+      </div>
+    `,
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log('✅ OTP email sent successfully');
+  } catch (error) {
+    console.error('❌ SendGrid Error:', error);
+    if (error.response) {
+      console.error('Error details:', error.response.body);
+    }
+    throw error;
+  }
 }
 
 // === REGISTER ===
@@ -46,15 +52,23 @@ exports.register = async (req, res) => {
     }
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      // User exists, redirect to login
       return res.status(200).json({ message: 'User already exists. Please login.', redirectToLogin: true });
     }
     const otp = generateOTP();
     const otpExpires = Date.now() + 10 * 60 * 1000;
     const user = new User({ username, email, password, otp, otpExpires });
     await user.save();
-    await sendOtpEmail(email, username, otp);
-    res.status(201).json({ message: 'User registered. OTP sent to email.', userId: user._id });
+    
+    try {
+      await sendOtpEmail(email, username, otp);
+      res.status(201).json({ message: 'User registered. OTP sent to email.', userId: user._id });
+    } catch (emailError) {
+      console.error('Email send failed:', emailError);
+      res.status(201).json({ 
+        message: 'User registered but email failed to send. Please contact support.', 
+        userId: user._id 
+      });
+    }
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -93,13 +107,19 @@ exports.login = async (req, res) => {
     if (!user.isVerified) return res.status(403).json({ message: 'Email not verified. Please verify your email.' });
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-    // Generate OTP for login
+    
     const otp = generateOTP();
     user.otp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
-    await sendOtpEmail(user.email, user.username, otp);
-    res.status(200).json({ message: 'OTP sent to email', userId: user._id });
+    
+    try {
+      await sendOtpEmail(user.email, user.username, otp);
+      res.status(200).json({ message: 'OTP sent to email', userId: user._id });
+    } catch (emailError) {
+      console.error('OTP email failed:', emailError);
+      res.status(500).json({ message: 'Failed to send OTP email. Please try again.' });
+    }
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -135,8 +155,14 @@ exports.resendOtp = async (req, res) => {
     user.otp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
-    await sendOtpEmail(user.email, user.username, otp);
-    res.status(200).json({ message: 'OTP resent to email' });
+    
+    try {
+      await sendOtpEmail(user.email, user.username, otp);
+      res.status(200).json({ message: 'OTP resent to email' });
+    } catch (emailError) {
+      console.error('Resend OTP failed:', emailError);
+      res.status(500).json({ message: 'Failed to resend OTP. Please try again.' });
+    }
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
