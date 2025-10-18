@@ -31,15 +31,23 @@ export default function Explore() {
       const response = await fetch("https://trading-app-backend-6ibt.onrender.com/api/users/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-      } else {
+      } else if (response.status === 401) {
+        // Token is invalid or expired, redirect to login
+        localStorage.removeItem("token");
         navigate("/login");
+      } else {
+        // For other errors, try to continue without user data
+        console.error("Error fetching user data");
+        setUser({ username: "User" }); // Default user
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
-      navigate("/login");
+      // Continue with default user on network error
+      setUser({ username: "User" });
     }
   };
 
